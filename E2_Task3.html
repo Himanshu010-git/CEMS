@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Payment | CEMS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #263b80;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        header p {
+            margin-bottom: 0;
+            color: #dbeafe;
+        }
+
+        main {
+            max-width: 950px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 4px 15px #0000000a;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #263b80;
+        }
+
+        .event-info {
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+
+        .event-info p {
+            margin: 10px 0;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 20px;
+            background: #263b80;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d2d60;
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .notice {
+            padding: 12px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .result {
+            display: none;
+            padding: 18px;
+            margin-top: 20px;
+            border-radius: 10px;
+            line-height: 1.7;
+        }
+
+        .success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .pending {
+            display: block;
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media (max-width: 700px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Campus Event Management System</h1>
+    <p>Event Payment and Registration</p>
+</header>
+
+<main>
+    <div class="layout">
+
+        <section class="card">
+            <h2>Event Details</h2>
+
+            <div class="event-info">
+                <p><strong>Event:</strong> Tech Fest 2026</p>
+                <p><strong>Date:</strong> 15 November 2026</p>
+                <p><strong>Venue:</strong> College Auditorium</p>
+                <p><strong>Registration Fee:</strong> ₹500</p>
+                <p><strong>Available Seats:</strong>
+                    <span id="seats">20</span>
+                </p>
+            </div>
+
+            <p><strong>Student:</strong> Rahul Sharma</p>
+            <p><strong>Registration ID:</strong> CEMS-2026-101</p>
+
+            <div class="notice">
+                This is a demonstration payment page.
+                No real money will be charged, and no real payment
+                details should be entered.
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Complete Payment</h2>
+
+            <form id="paymentForm">
+                <label for="studentEmail">Student Email</label>
+                <input
+                    type="email"
+                    id="studentEmail"
+                    placeholder="student@example.com"
+                    required
+                >
+
+                <label for="method">Payment Method</label>
+                <select id="method" required>
+                    <option value="">Select payment method</option>
+                    <option value="UPI">UPI (Demo)</option>
+                    <option value="Card">Card (Demo)</option>
+                    <option value="Net Banking">Net Banking (Demo)</option>
+                </select>
+
+                <label for="paymentResult">Simulate Payment Result</label>
+                <select id="paymentResult" required>
+                    <option value="success">Successful Payment</option>
+                    <option value="failed">Failed Payment</option>
+                </select>
+
+                <button type="submit" id="payButton">
+                    Pay ₹500
+                </button>
+            </form>
+
+            <div id="result" class="result" role="status"
+                aria-live="polite"></div>
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    Campus Event Management System &copy; 2026
+</footer>
+
+<script>
+    let availableSeats = 20;
+    let registrationConfirmed = false;
+
+    const paymentForm = document.getElementById("paymentForm");
+    const resultBox = document.getElementById("result");
+    const payButton = document.getElementById("payButton");
+
+    paymentForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        if (registrationConfirmed) {
+            showResult(
+                "Registration has already been confirmed.",
+                "success"
+            );
+            return;
+        }
+
+        if (availableSeats <= 0) {
+            showResult(
+                "Payment cannot proceed because no seats are available.",
+                "error"
+            );
+            return;
+        }
+
+        const email = document.getElementById("studentEmail").value;
+        const method = document.getElementById("method").value;
+        const paymentStatus =
+            document.getElementById("paymentResult").value;
+
+        if (!email || !method) {
+            showResult("Please complete all required fields.", "error");
+            return;
+        }
+
+        if (paymentStatus === "failed") {
+            showResult(
+                "Payment failed. Your registration is not confirmed. " +
+                "Please try again.",
+                "error"
+            );
+            return;
+        }
+
+        // Simulated successful payment.
+        availableSeats--;
+        registrationConfirmed = true;
+
+        document.getElementById("seats").textContent = availableSeats;
+
+        showResult(
+            "Payment Successful!<br><br>" +
+            "<strong>Registration Confirmed</strong><br>" +
+            "Event: Tech Fest 2026<br>" +
+            "Registration ID: CEMS-2026-101<br>" +
+            "Email: " + escapeHTML(email) + "<br>" +
+            "Payment Method: " + escapeHTML(method) + "<br>" +
+            "Amount: ₹500<br>" +
+            "Payment Status: Successful<br>" +
+            "Registration Status: Confirmed",
+            "success"
+        );
+
+        payButton.textContent = "Payment Completed";
+        payButton.disabled = true;
+    });
+
+    function showResult(message, type) {
+        resultBox.className = "result " + type;
+        resultBox.innerHTML = message;
+    }
+
+    function escapeHTML(value) {
+        return value.replace(/[&<>"']/g, function(character) {
+            const entities = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            };
+
+            return entities[character];
+        });
+    }
+</script>
+
+</body>
+</html>

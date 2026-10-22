@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEMS Role-Based Access</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #263b80;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 15px #0000000a;
+        }
+
+        h2 { color: #263b80; }
+
+        label {
+            display: block;
+            margin: 12px 0 7px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        button {
+            padding: 11px 16px;
+            border: 0;
+            border-radius: 7px;
+            background: #263b80;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover { background: #1d2d60; }
+
+        #dashboard, #message {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        #dashboard { background: #eff6ff; }
+        #message { display: none; }
+        .success { display: block !important; background: #dcfce7; color: #166534; }
+        .error { display: block !important; background: #fee2e2; color: #991b1b; }
+
+        li { margin: 9px 0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Campus Event Management System</h1>
+    <p>Role-Based Access Control</p>
+</header>
+
+<main>
+    <section class="panel">
+        <h2>Access Control Demo</h2>
+        <p>Select a demo user to simulate a signed-in account.</p>
+
+        <label for="role">Demo User Role</label>
+        <select id="role">
+            <option value="STUDENT">Student</option>
+            <option value="ORGANIZER">Organizer</option>
+            <option value="ADMIN">Administrator</option>
+        </select>
+
+        <div class="buttons">
+            <button onclick="showDashboard()">Open Dashboard</button>
+        </div>
+
+        <div id="dashboard">
+            Select a role and open the dashboard.
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Protected Sections</h2>
+        <p>Choose a section to check whether the selected role has permission.</p>
+
+        <div class="buttons">
+            <button onclick="checkAccess('STUDENT')">Student Section</button>
+            <button onclick="checkAccess('ORGANIZER')">Organizer Section</button>
+            <button onclick="checkAccess('ADMIN')">Admin Section</button>
+            <button onclick="checkAccess('EVENTS')">Public Events</button>
+        </div>
+
+        <div id="message" role="status" aria-live="polite"></div>
+    </section>
+</main>
+
+<script>
+    const permissions = {
+        STUDENT: ["EVENTS", "STUDENT"],
+        ORGANIZER: ["EVENTS", "ORGANIZER"],
+        ADMIN: ["EVENTS", "STUDENT", "ORGANIZER", "ADMIN"]
+    };
+
+    const sectionNames = {
+        STUDENT: "Student Section",
+        ORGANIZER: "Organizer Section",
+        ADMIN: "Administrator Section",
+        EVENTS: "Public Events"
+    };
+
+    function currentRole() {
+        return document.getElementById("role").value;
+    }
+
+    function showDashboard() {
+        const role = currentRole();
+        const dashboard = document.getElementById("dashboard");
+
+        const features = {
+            STUDENT: [
+                "Browse campus events",
+                "Register for events",
+                "View your registrations"
+            ],
+            ORGANIZER: [
+                "Create and manage events",
+                "View event registrations",
+                "Monitor event seats"
+            ],
+            ADMIN: [
+                "Manage users and roles",
+                "Manage all events",
+                "View system information"
+            ]
+        };
+
+        dashboard.innerHTML =
+            "<h3>Welcome, " + role + "</h3><p>Available features:</p><ul>" +
+            features[role].map(feature => "<li>" + feature + "</li>").join("") +
+            "</ul>";
+
+        showMessage("Dashboard opened for " + role + ".", true);
+    }
+
+    function checkAccess(section) {
+        const role = currentRole();
+        const allowed = permissions[role].includes(section);
+
+        if (allowed) {
+            showMessage(
+                "Access granted: " + role + " can access " +
+                sectionNames[section] + ".",
+                true
+            );
+        } else {
+            showMessage(
+                "Access denied: " + role + " cannot access " +
+                sectionNames[section] + ".",
+                false
+            );
+        }
+    }
+
+    function showMessage(text, success) {
+        const message = document.getElementById("message");
+        message.textContent = text;
+        message.className = success ? "success" : "error";
+    }
+
+    showDashboard();
+</script>
+
+</body>
+</html>

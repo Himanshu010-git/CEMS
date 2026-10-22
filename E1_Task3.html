@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEMS Password Reset</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #263b80;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        main {
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px #00000012;
+        }
+
+        h2 { color: #263b80; }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 18px;
+            border: 0;
+            border-radius: 7px;
+            background: #263b80;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover { background: #1d2d60; }
+
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 12px;
+            border-radius: 7px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        #message {
+            display: none;
+            margin-top: 18px;
+            padding: 13px;
+            border-radius: 7px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .success { display: block !important; background: #dcfce7; color: #166534; }
+        .error { display: block !important; background: #fee2e2; color: #991b1b; }
+
+        .section { margin-top: 25px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Campus Event Management System</h1>
+    <p>Password Recovery</p>
+</header>
+
+<main>
+    <section class="panel">
+        <h2>Forgot Password?</h2>
+        <p>Request a reset code to change your password.</p>
+
+        <div class="note">
+            Demo account: student@example.com<br>
+            Initial password: Student123<br>
+            The reset code will be shown on this page for testing.
+        </div>
+
+        <form id="requestForm">
+            <label for="resetEmail">Registered Email</label>
+            <input type="email" id="resetEmail"
+                   placeholder="student@example.com" required>
+            <button type="submit">Generate Reset Code</button>
+        </form>
+
+        <div class="section">
+            <h2>Reset Your Password</h2>
+
+            <form id="resetForm">
+                <label for="resetCode">Reset Code</label>
+                <input type="text" id="resetCode"
+                       placeholder="Enter reset code" required>
+
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword"
+                       placeholder="At least 8 characters" minlength="8" required>
+
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword"
+                       placeholder="Re-enter new password" minlength="8" required>
+
+                <button type="submit">Reset Password</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Test Login</h2>
+
+            <form id="loginForm">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail"
+                       placeholder="student@example.com" required>
+
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword"
+                       placeholder="Enter password" required>
+
+                <button type="submit">Test Login</button>
+            </form>
+        </div>
+
+        <div id="message" role="status" aria-live="polite"></div>
+    </section>
+</main>
+
+<script>
+    const demoEmail = "student@example.com";
+    let demoPassword = "Student123";
+    let activeCode = null;
+
+    function showMessage(text, success) {
+        const message = document.getElementById("message");
+        message.textContent = text;
+        message.className = success ? "success" : "error";
+    }
+
+    document.getElementById("requestForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("resetEmail")
+            .value.trim().toLowerCase();
+
+        if (email !== demoEmail) {
+            showMessage(
+                "If the account exists, password reset instructions will be sent.",
+                true
+            );
+            return;
+        }
+
+        // Demo only: use a secure, expiring token delivered by email in production.
+        activeCode = String(Math.floor(100000 + Math.random() * 900000));
+
+        showMessage(
+            "Demo reset code: " + activeCode +
+            ". Use this code in the reset form.",
+            true
+        );
+    });
+
+    document.getElementById("resetForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const code = document.getElementById("resetCode").value.trim();
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (activeCode === null || code !== activeCode) {
+            showMessage("Invalid reset code. Request a new code and try again.", false);
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            showMessage("Password must contain at least 8 characters.", false);
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showMessage("The passwords do not match.", false);
+            return;
+        }
+
+        demoPassword = newPassword;
+        activeCode = null;
+
+        document.getElementById("resetForm").reset();
+
+        showMessage(
+            "Password reset successful! You can now test login with your new password.",
+            true
+        );
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("loginEmail")
+            .value.trim().toLowerCase();
+        const password = document.getElementById("loginPassword").value;
+
+        if (email === demoEmail && password === demoPassword) {
+            showMessage("Login successful! Authentication test passed.", true);
+        } else {
+            showMessage("Invalid email or password. Authentication test failed.", false);
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Event Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: #263b80;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        header p {
+            margin-bottom: 0;
+            color: #dbeafe;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat, .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000a;
+        }
+
+        .stat p {
+            color: #64748b;
+            margin: 0 0 10px;
+        }
+
+        .stat h2 {
+            margin: 0;
+            color: #263b80;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .confirmed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .button {
+            background: #263b80;
+            color: white;
+            padding: 9px 13px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #1d2d60;
+        }
+
+        .button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .success-message {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error-message {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            padding: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Campus Event Management System</h1>
+    <p>Event Registration Dashboard</p>
+</header>
+
+<main>
+    <section class="summary">
+        <div class="stat">
+            <p>Total Events</p>
+            <h2 id="totalEvents">3</h2>
+        </div>
+
+        <div class="stat">
+            <p>Confirmed Registrations</p>
+            <h2 id="confirmedCount">1</h2>
+        </div>
+
+        <div class="stat">
+            <p>Available Seats</p>
+            <h2 id="availableSeats">11</h2>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Event Registration Status</h2>
+        <p>View registration and payment status for campus events.</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Student</th>
+                        <th>Seats Left</th>
+                        <th>Payment</th>
+                        <th>Registration</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="eventTable"></tbody>
+            </table>
+        </div>
+
+        <div id="message" class="message" role="status"></div>
+    </section>
+</main>
+
+<footer>
+    Campus Event Management System &copy; 2026
+</footer>
+
+<script>
+    const events = [
+        {
+            id: 1,
+            name: "Hackathon 2026",
+            student: "Rahul",
+            seats: 5,
+            payment: "Paid",
+            status: "Confirmed"
+        },
+        {
+            id: 2,
+            name: "Web Development Workshop",
+            student: "Priya",
+            seats: 4,
+            payment: "Pending",
+            status: "Pending"
+        },
+        {
+            id: 3,
+            name: "Tech Fest",
+            student: "Amit",
+            seats: 2,
+            payment: "Free",
+            status: "Confirmed"
+        }
+    ];
+
+    function renderEvents() {
+        const table = document.getElementById("eventTable");
+        table.innerHTML = "";
+
+        events.forEach(event => {
+            const row = document.createElement("tr");
+
+            const statusClass =
+                event.status === "Confirmed" ? "confirmed" :
+                event.status === "Pending" ? "pending" : "failed";
+
+            row.innerHTML = `
+                <td>${event.name}</td>
+                <td>${event.student}</td>
+                <td>${event.seats}</td>
+                <td>${event.payment}</td>
+                <td>
+                    <span class="status ${statusClass}">
+                        ${event.status}
+                    </span>
+                </td>
+                <td>
+                    <button class="button"
+                        ${event.status === "Confirmed" ||
+                          event.seats === 0 ? "disabled" : ""}
+                        onclick="confirmRegistration(${event.id})">
+                        Confirm
+                    </button>
+                </td>
+            `;
+
+            table.appendChild(row);
+        });
+
+        document.getElementById("totalEvents").textContent =
+            events.length;
+
+        document.getElementById("confirmedCount").textContent =
+            events.filter(e => e.status === "Confirmed").length;
+
+        document.getElementById("availableSeats").textContent =
+            events.reduce((sum, event) => sum + event.seats, 0);
+    }
+
+    function showMessage(message, success) {
+        const box = document.getElementById("message");
+        box.textContent = message;
+        box.className = "message " +
+            (success ? "success-message" : "error-message");
+    }
+
+    function confirmRegistration(id) {
+        const event = events.find(e => e.id === id);
+
+        if (!event) {
+            showMessage("Event not found.", false);
+            return;
+        }
+
+        if (event.seats <= 0) {
+            showMessage("No seats available for this event.", false);
+            return;
+        }
+
+        if (event.status === "Confirmed") {
+            showMessage("Registration is already confirmed.", false);
+            return;
+        }
+
+        if (event.payment === "Pending") {
+            showMessage(
+                "Payment is pending. Complete payment before confirmation.",
+                false
+            );
+            return;
+        }
+
+        event.seats--;
+        event.status = "Confirmed";
+
+        renderEvents();
+        showMessage(
+            "Registration confirmed successfully for " + event.name + ".",
+            true
+        );
+    }
+
+    renderEvents();
+</script>
+
+</body>
+</html>

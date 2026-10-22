@@ -1,0 +1,406 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration | CEMS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #263b80;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        header p {
+            color: #dbeafe;
+            margin-bottom: 0;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat, .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #0000000a;
+        }
+
+        .stat p {
+            color: #64748b;
+            margin: 0 0 10px;
+        }
+
+        .stat h2 {
+            color: #263b80;
+            margin: 0;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .event-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .event-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .event-card h3 {
+            margin-top: 0;
+            color: #263b80;
+        }
+
+        .event-card p {
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .seat-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .seat-badge.full {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 12px 0 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 11px;
+            margin-top: 12px;
+            background: #263b80;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d2d60;
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .registration-list {
+            margin-top: 25px;
+        }
+
+        .registration-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Campus Event Management System</h1>
+    <p>Browse events and register for your favorites</p>
+</header>
+
+<main>
+
+    <section class="summary">
+        <div class="stat">
+            <p>Total Events</p>
+            <h2 id="totalEvents">3</h2>
+        </div>
+
+        <div class="stat">
+            <p>Available Seats</p>
+            <h2 id="totalSeats">8</h2>
+        </div>
+
+        <div class="stat">
+            <p>My Registrations</p>
+            <h2 id="myRegistrations">0</h2>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Available Events</h2>
+        <p>Select an event and enter your student ID to register.</p>
+
+        <div class="event-list" id="eventList"></div>
+
+        <div id="message" class="message" role="status"
+             aria-live="polite"></div>
+    </section>
+
+    <section class="panel registration-list">
+        <h2>My Registration History</h2>
+        <div id="registrationHistory">
+            No registrations yet.
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    Campus Event Management System &copy; 2026
+</footer>
+
+<script>
+    const events = [
+        {
+            id: 101,
+            name: "Hackathon 2026",
+            date: "15 November 2026",
+            venue: "Computer Lab",
+            totalSeats: 3,
+            availableSeats: 3
+        },
+        {
+            id: 102,
+            name: "Web Development Workshop",
+            date: "18 November 2026",
+            venue: "Seminar Hall",
+            totalSeats: 2,
+            availableSeats: 2
+        },
+        {
+            id: 103,
+            name: "Annual Tech Fest",
+            date: "22 November 2026",
+            venue: "College Auditorium",
+            totalSeats: 3,
+            availableSeats: 3
+        }
+    ];
+
+    // Stores student IDs registered for each event.
+    const registrations = {};
+
+    events.forEach(event => {
+        registrations[event.id] = [];
+    });
+
+    function renderEvents() {
+        const eventList = document.getElementById("eventList");
+        eventList.innerHTML = "";
+
+        events.forEach(event => {
+            const card = document.createElement("div");
+            card.className = "event-card";
+
+            const seatClass =
+                event.availableSeats === 0 ? "seat-badge full" : "seat-badge";
+
+            card.innerHTML = `
+                <h3>${event.name}</h3>
+                <p><strong>Date:</strong> ${event.date}</p>
+                <p><strong>Venue:</strong> ${event.venue}</p>
+                <p>
+                    <span class="${seatClass}">
+                        ${event.availableSeats === 0
+                            ? "Event Full"
+                            : event.availableSeats + " seats available"}
+                    </span>
+                </p>
+
+                <label for="student-${event.id}">Student ID</label>
+                <input
+                    type="text"
+                    id="student-${event.id}"
+                    placeholder="e.g. STU001"
+                    maxlength="30"
+                >
+
+                <button
+                    onclick="registerStudent(${event.id})"
+                    ${event.availableSeats === 0 ? "disabled" : ""}>
+                    Register Now
+                </button>
+            `;
+
+            eventList.appendChild(card);
+        });
+
+        updateDashboard();
+    }
+
+    function registerStudent(eventId) {
+        const event = events.find(item => item.id === eventId);
+
+        if (!event) {
+            showMessage("Event not found.", false);
+            return;
+        }
+
+        const input = document.getElementById("student-" + eventId);
+        const studentId = input.value.trim().toUpperCase();
+
+        if (!studentId) {
+            showMessage("Please enter your student ID.", false);
+            return;
+        }
+
+        if (event.availableSeats <= 0) {
+            showMessage("Registration failed. This event is full.", false);
+            renderEvents();
+            return;
+        }
+
+        if (registrations[eventId].includes(studentId)) {
+            showMessage(
+                "You have already registered for this event.",
+                false
+            );
+            return;
+        }
+
+        registrations[eventId].push(studentId);
+        event.availableSeats--;
+
+        showMessage(
+            "Registration successful for " + event.name +
+            "! Student ID: " + studentId,
+            true
+        );
+
+        renderEvents();
+        renderRegistrationHistory(studentId);
+    }
+
+    function renderRegistrationHistory(studentId) {
+        const history = document.getElementById("registrationHistory");
+
+        const studentRegistrations = events.filter(event =>
+            registrations[event.id].includes(studentId)
+        );
+
+        if (studentRegistrations.length === 0) {
+            history.textContent = "No registrations yet.";
+            return;
+        }
+
+        history.innerHTML = "";
+
+        studentRegistrations.forEach(event => {
+            const item = document.createElement("div");
+            item.className = "registration-item";
+            item.textContent =
+                event.name + " — " + event.date + " — Registered";
+            history.appendChild(item);
+        });
+    }
+
+    function updateDashboard() {
+        document.getElementById("totalEvents").textContent = events.length;
+
+        const totalSeats = events.reduce(
+            (sum, event) => sum + event.availableSeats, 0
+        );
+
+        document.getElementById("totalSeats").textContent = totalSeats;
+
+        const totalRegistrations = Object.values(registrations).reduce(
+            (sum, list) => sum + list.length, 0
+        );
+
+        document.getElementById("myRegistrations").textContent =
+            totalRegistrations;
+    }
+
+    function showMessage(text, success) {
+        const message = document.getElementById("message");
+        message.textContent = text;
+        message.className =
+            "message " + (success ? "success" : "error");
+    }
+
+    renderEvents();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEMS - Final Project | Campus Event Management System</title>
+<meta name="description" content="Campus Event Management System - Final Project combining all tasks in a complete workflow.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#1e3a8a;--brand-light:#3b5fc0;--brand-dark:#162d6e;
+  --accent:#6366f1;--bg:#0f172a;--surface:#1e293b;
+  --surface2:#273549;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;
+  --sw:290px;--r:14px
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+/* HEADER */
+.top-hdr{background:linear-gradient(135deg,var(--brand-dark),var(--brand),var(--brand-light));padding:15px 30px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px #00000055}
+.hdr-logo{width:42px;height:42px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,.2);flex-shrink:0}
+.hdr-txt h1{font-size:18px;font-weight:700;color:#fff}
+.hdr-txt p{font-size:12px;color:#bfdbfe;margin-top:1px}
+.hdr-prog{margin-left:auto;display:flex;align-items:center;gap:10px;color:#bfdbfe;font-size:12px;white-space:nowrap}
+.prog-bar{width:110px;height:5px;background:rgba(255,255,255,.2);border-radius:999px;overflow:hidden}
+.prog-fill{height:100%;background:#6ee7b7;border-radius:999px;transition:width .5s ease;width:16.67%}
+/* LAYOUT */
+.wrap{display:flex;flex:1}
+/* SIDEBAR */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:22px 0;position:sticky;top:73px;height:calc(100vh - 73px);overflow-y:auto}
+.sg-lbl{font-size:10px;font-weight:700;letter-spacing:1.4px;color:var(--muted);text-transform:uppercase;padding:0 18px;margin-bottom:8px}
+.sg{margin-bottom:20px}
+.si{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;border-left:3px solid transparent;transition:all .2s}
+.si:hover{background:var(--surface2)}
+.si.active{background:rgba(99,102,241,.12);border-left-color:var(--accent)}
+.si.active .sn{background:var(--accent);color:#fff;border-color:var(--accent)}
+.si.active .sl{color:#fff;font-weight:600}
+.si.done .sn{background:#16a34a;color:#fff;border-color:#16a34a}
+.sn{width:26px;height:26px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;border:1.5px solid var(--border);transition:all .3s}
+.sl{font-size:12px;color:var(--muted);line-height:1.3;transition:color .2s}
+.sbg{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:600;flex-shrink:0}
+.be1{background:rgba(99,102,241,.2);color:#a5b4fc}
+.be2{background:rgba(20,184,166,.2);color:#5eead4}
+.sdiv{height:1px;background:var(--border);margin:10px 18px 18px}
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:30px 34px;background:var(--bg)}
+/* BANNER */
+.wf-banner{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:var(--r);padding:22px 26px;margin-bottom:26px;display:flex;align-items:center;gap:16px}
+.wf-icon{font-size:36px;flex-shrink:0}
+.wf-banner h2{font-size:19px;font-weight:700;color:#fff}
+.wf-banner p{color:var(--muted);font-size:13px;margin-top:4px;line-height:1.6}
+/* EXP LABEL */
+.exp-lbl{display:flex;align-items:center;gap:12px;margin:38px 0 20px}
+.exp-line{flex:1;height:1px;background:var(--border)}
+.exp-badge{padding:5px 16px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.exp-e1{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+.exp-e2{background:rgba(20,184,166,.15);color:#5eead4;border:1px solid rgba(20,184,166,.3)}
+/* SECTION */
+.sec-block{margin-bottom:34px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.sec-hdr{background:linear-gradient(90deg,var(--surface2),var(--surface));padding:15px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.sec-hdr h3{font-size:15px;font-weight:600;color:#fff}
+.sec-hdr .sub{font-size:11px;color:var(--muted);margin-top:1px}
+.sh-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.sh-e1{background:rgba(99,102,241,.25);color:#a5b4fc}
+.sh-e2{background:rgba(20,184,166,.25);color:#5eead4}
+.sec-tag{padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;margin-left:auto}
+.tag-e1{background:rgba(99,102,241,.25);color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+.tag-e2{background:rgba(20,184,166,.25);color:#5eead4;border:1px solid rgba(20,184,166,.3)}
+.sec-body{background:#fff;color:#1e293b}
+/* ARROW CONNECTOR */
+.arrow{display:flex;align-items:center;justify-content:center;padding:7px 0;gap:8px}
+.arr-line{height:2px;flex:1;max-width:55px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}
+.arr-icon{font-size:20px;color:var(--accent);opacity:.5}
+/* TASK WRAPPER */
+.tw{padding:22px 26px;font-family:Arial,sans-serif}
+.tw h2{color:#263b80;font-size:17px;margin-bottom:5px}
+.tw>p,.tw .desc{color:#475569;font-size:13px;margin-bottom:12px}
+.tw label{display:block;font-weight:600;font-size:13px;color:#1e293b;margin:11px 0 4px}
+.tw input,.tw select{width:100%;padding:10px 11px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;color:#1e293b;background:#f8fafc;outline:none;font-family:Arial,sans-serif;transition:border-color .2s}
+.tw input:focus,.tw select:focus{border-color:#263b80;background:#fff}
+.tw button{padding:10px 15px;background:#263b80;color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;font-family:Arial,sans-serif;transition:background .2s,transform .1s}
+.tw button:hover{background:#1d2d60;transform:translateY(-1px)}
+.tw button:disabled{background:#94a3b8;cursor:not-allowed;transform:none}
+.tw .btn-full{width:100%;margin-top:12px;display:block}
+.tw .demo-box{background:#eff6ff;border:1px solid #bfdbfe;padding:11px;border-radius:7px;font-size:13px;line-height:1.7;margin-bottom:14px}
+.tw .note-box{background:#eff6ff;color:#1d4ed8;padding:11px;border-radius:7px;font-size:13px;line-height:1.5;margin-bottom:12px}
+.tw .notice-box{background:#eff6ff;color:#1d4ed8;padding:9px 11px;border-radius:7px;font-size:13px;line-height:1.5}
+.tw .form-box{max-width:390px;margin:0 auto;background:#fff;padding:20px;border-radius:11px;box-shadow:0 2px 12px #0003}
+.tw .msg{margin-top:11px;padding:10px;border-radius:7px;font-size:13px;display:none}
+.tw .msg.ok{display:block;background:#dcfce7;color:#166534}
+.tw .msg.err{display:block;background:#fee2e2;color:#991b1b}
+/* panels */
+.tw .panel{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:16px;margin-bottom:13px}
+.tw .panel h2{text-align:left;margin-bottom:4px}
+.tw .btn-grp{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.tw .btn-grp button{width:auto;margin:0}
+.tw .dash-box{background:#eff6ff;border-radius:7px;padding:11px;margin-top:11px;font-size:13px;line-height:1.7}
+.tw .t-div{border-top:1px solid #e2e8f0;margin:16px 0;padding-top:13px}
+/* stats */
+.tw .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:11px;margin-bottom:16px}
+.tw .stat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:13px;text-align:center}
+.tw .stat p{color:#64748b;font-size:11px;margin:0 0 5px}
+.tw .stat h3{color:#263b80;font-size:20px;font-weight:700;margin:0}
+/* event cards */
+.tw .ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:11px;margin-bottom:14px}
+.tw .ev-card{border:1px solid #e2e8f0;border-radius:9px;padding:13px;background:#fff}
+.tw .ev-card h4{color:#263b80;margin-bottom:6px;font-size:13px}
+.tw .ev-card p{font-size:12px;color:#475569;margin:3px 0}
+.tw .seat-tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600;background:#dcfce7;color:#166534;margin:5px 0 7px}
+.tw .seat-tag.full{background:#fee2e2;color:#991b1b}
+/* table */
+.tw .tbl-wrap{overflow-x:auto}
+.tw table{width:100%;border-collapse:collapse;font-size:13px}
+.tw th,.tw td{padding:10px 9px;text-align:left;border-bottom:1px solid #e2e8f0}
+.tw th{background:#f8fafc;font-weight:600;color:#475569;font-size:11px}
+.tw .pill{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.tw .pill-ok{background:#dcfce7;color:#166534}
+.tw .pill-pend{background:#fef3c7;color:#92400e}
+.tw .pill-err{background:#fee2e2;color:#991b1b}
+/* payment */
+.tw .pay-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tw .pay-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:15px}
+.tw .pay-card h3{color:#263b80;margin-bottom:9px;font-size:14px}
+.tw .ev-info{background:#fff;border-radius:7px;padding:9px;margin-bottom:9px}
+.tw .ev-info p{font-size:12px;margin:4px 0;color:#475569}
+.tw .hist-box{background:#f8fafc;border-radius:7px;padding:11px;margin-top:12px}
+.tw .reg-item{padding:7px 0;border-bottom:1px solid #e2e8f0;font-size:12px;color:#475569}
+.tw .reg-item:last-child{border-bottom:none}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
+@media(max-width:900px){:root{--sw:230px}.main{padding:18px 14px}}
+@media(max-width:680px){.sidebar,.hdr-prog{display:none}}
+@media(max-width:580px){.tw .pay-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="top-hdr">
+  <div class="hdr-logo">&#127979;</div>
+  <div class="hdr-txt">
+    <h1>Campus Event Management System</h1>
+    <p>Final Project &#8212; Complete Workflow (E1 &#8594; E2)</p>
+  </div>
+  <div class="hdr-prog">
+    <span id="progTxt">Step 1 / 6</span>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="sidebar">
+  <div class="sg">
+    <div class="sg-lbl">Experiment 1 &#8212; Authentication</div>
+    <div class="si active" onclick="goTo('s1',this)"><div class="sn">1</div><div><div class="sl">User Login</div></div><span class="sbg be1">E1&#183;T1</span></div>
+    <div class="si" onclick="goTo('s2',this)"><div class="sn">2</div><div><div class="sl">Role-Based Access</div></div><span class="sbg be1">E1&#183;T2</span></div>
+    <div class="si" onclick="goTo('s3',this)"><div class="sn">3</div><div><div class="sl">Password Recovery</div></div><span class="sbg be1">E1&#183;T3</span></div>
+  </div>
+  <div class="sdiv"></div>
+  <div class="sg">
+    <div class="sg-lbl">Experiment 2 &#8212; Event Management</div>
+    <div class="si" onclick="goTo('s4',this)"><div class="sn">4</div><div><div class="sl">Event Registration</div></div><span class="sbg be2">E2&#183;T1</span></div>
+    <div class="si" onclick="goTo('s5',this)"><div class="sn">5</div><div><div class="sl">Registration Dashboard</div></div><span class="sbg be2">E2&#183;T2</span></div>
+    <div class="si" onclick="goTo('s6',this)"><div class="sn">6</div><div><div class="sl">Payment &amp; Confirmation</div></div><span class="sbg be2">E2&#183;T3</span></div>
+  </div>
+</aside>
+
+<main class="main" id="mainScroll">
+
+  <div class="wf-banner">
+    <div class="wf-icon">&#128260;</div>
+    <div>
+      <h2>End-to-End Workflow</h2>
+      <p>All six tasks across two experiments in one sequential page &#8212; from user authentication to event payment confirmation. Use the sidebar to jump between steps.</p>
+    </div>
+  </div>
+
+  <div class="exp-lbl"><div class="exp-line"></div><span class="exp-badge exp-e1">&#9879; Experiment 1 &#8212; User Authentication</span><div class="exp-line"></div></div>
+
+  <!-- S1: E1 Task1 Login -->
+  <div class="sec-block" id="s1">
+    <div class="sec-hdr">
+      <div class="sh-num sh-e1">1</div>
+      <div><h3>User Login</h3><div class="sub">E1 &#183; Task 1 &#8212; CEMS Login Page</div></div>
+      <span class="sec-tag tag-e1">E1 &#183; T1</span>
+    </div>
+    <div class="sec-body">
+      <div class="tw">
+        <h2>User Login</h2>
+        <p class="desc">Sign in to access your campus account.</p>
+        <div class="demo-box"><strong>Demo credentials</strong><br>Email: student@example.com<br>Password: Student123</div>
+        <div class="form-box">
+          <form id="loginForm">
+            <label for="t1Email">Email Address</label>
+            <input type="email" id="t1Email" placeholder="Enter your email" required>
+            <label for="t1Pass">Password</label>
+            <input type="password" id="t1Pass" placeholder="Enter your password" required>
+            <button type="submit" class="btn-full">Login</button>
+          </form>
+          <div id="t1Msg" class="msg" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arr-line"></div><span class="arr-icon">&#8595;</span><div class="arr-line"></div></div>
+
+  <!-- S2: E1 Task2 Role Access -->
+  <div class="sec-block" id="s2">
+    <div class="sec-hdr">
+      <div class="sh-num sh-e1">2</div>
+      <div><h3>Role-Based Access Control</h3><div class="sub">E1 &#183; Task 2 &#8212; Dashboard by Role</div></div>
+      <span class="sec-tag tag-e1">E1 &#183; T2</span>
+    </div>
+    <div class="sec-body">
+      <div class="tw">
+        <div class="panel">
+          <h2>Access Control Demo</h2>
+          <p class="desc">Select a demo user to simulate a signed-in account.</p>
+          <label for="t2Role">Demo User Role</label>
+          <select id="t2Role" onchange="t2Dashboard()">
+            <option value="STUDENT">Student</option>
+            <option value="ORGANIZER">Organizer</option>
+            <option value="ADMIN">Administrator</option>
+          </select>
+          <div class="btn-grp" style="margin-top:11px"><button onclick="t2Dashboard()">Open Dashboard</button></div>
+          <div id="t2Dash" class="dash-box">Select a role and open the dashboard.</div>
+        </div>
+        <div class="panel">
+          <h2>Protected Sections</h2>
+          <p class="desc">Check whether the selected role has access to each section.</p>
+          <div class="btn-grp">
+            <button onclick="t2Access('STUDENT')">Student Section</button>
+            <button onclick="t2Access('ORGANIZER')">Organizer Section</button>
+            <button onclick="t2Access('ADMIN')">Admin Section</button>
+            <button onclick="t2Access('EVENTS')">Public Events</button>
+          </div>
+          <div id="t2Msg" class="msg" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arr-line"></div><span class="arr-icon">&#8595;</span><div class="arr-line"></div></div>
+
+  <!-- S3: E1 Task3 Password Reset -->
+  <div class="sec-block" id="s3">
+    <div class="sec-hdr">
+      <div class="sh-num sh-e1">3</div>
+      <div><h3>Password Recovery</h3><div class="sub">E1 &#183; Task 3 &#8212; Forgot Password &amp; Reset</div></div>
+      <span class="sec-tag tag-e1">E1 &#183; T3</span>
+    </div>
+    <div class="sec-body">
+      <div class="tw">
+        <h2>Forgot Password?</h2>
+        <p class="desc">Request a reset code to change your password.</p>
+        <div class="note-box">Demo account: student@example.com<br>Initial password: Student123<br>The reset code will appear here for testing.</div>
+        <form id="t3ReqForm">
+          <label for="t3ResetEmail">Registered Email</label>
+          <input type="email" id="t3ResetEmail" placeholder="student@example.com" required>
+          <button type="submit" class="btn-full">Generate Reset Code</button>
+        </form>
+        <div class="t-div">
+          <h2>Reset Your Password</h2>
+          <form id="t3ResetForm">
+            <label for="t3Code">Reset Code</label>
+            <input type="text" id="t3Code" placeholder="Enter reset code" required>
+            <label for="t3NewPwd">New Password</label>
+            <input type="password" id="t3NewPwd" placeholder="At least 8 characters" minlength="8" required>
+            <label for="t3ConfPwd">Confirm New Password</label>
+            <input type="password" id="t3ConfPwd" placeholder="Re-enter new password" minlength="8" required>
+            <button type="submit" class="btn-full">Reset Password</button>
+          </form>
+        </div>
+        <div class="t-div">
+          <h2>Test Login</h2>
+          <form id="t3TestLogin">
+            <label for="t3TEmail">Email</label>
+            <input type="email" id="t3TEmail" placeholder="student@example.com" required>
+            <label for="t3TPwd">Password</label>
+            <input type="password" id="t3TPwd" placeholder="Enter password" required>
+            <button type="submit" class="btn-full">Test Login</button>
+          </form>
+        </div>
+        <div id="t3Msg" class="msg" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exp-lbl"><div class="exp-line"></div><span class="exp-badge exp-e2">&#9879; Experiment 2 &#8212; Event Management</span><div class="exp-line"></div></div>
+
+  <!-- S4: E2 Task1 Event Registration -->
+  <div class="sec-block" id="s4">
+    <div class="sec-hdr">
+      <div class="sh-num sh-e2">4</div>
+      <div><h3>Event Registration</h3><div class="sub">E2 &#183; Task 1 &#8212; Browse &amp; Register for Events</div></div>
+      <span class="sec-tag tag-e2">E2 &#183; T1</span>
+    </div>
+    <div class="sec-body">
+      <div class="tw">
+        <div class="stat-grid">
+          <div class="stat"><p>Total Events</p><h3 id="t4Total">3</h3></div>
+          <div class="stat"><p>Available Seats</p><h3 id="t4Seats">8</h3></div>
+          <div class="stat"><p>My Registrations</p><h3 id="t4MyRegs">0</h3></div>
+        </div>
+        <h2>Available Events</h2>
+        <p class="desc">Select an event and enter your Student ID to register.</p>
+        <div class="ev-grid" id="t4List"></div>
+        <div id="t4Msg" class="msg" role="status" aria-live="polite"></div>
+        <div style="margin-top:16px">
+          <h2>My Registration History</h2>
+          <div class="hist-box" id="t4Hist">No registrations yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arr-line"></div><span class="arr-icon">&#8595;</span><div class="arr-line"></div></div>
+
+  <!-- S5: E2 Task2 Dashboard -->
+  <div class="sec-block" id="s5">
+    <div class="sec-hdr">
+      <div class="sh-num sh-e2">5</div>
+      <div><h3>Registration Dashboard</h3><div class="sub">E2 &#183; Task 2 &#8212; Status &amp; Confirmation</div></div>
+      <span class="sec-tag tag-e2">E2 &#183; T2</span>
+    </div>
+    <div class="sec-body">
+      <div class="tw">
+        <div class="stat-grid">
+          <div class="stat"><p>Total Events</p><h3 id="t5Total">3</h3></div>
+          <div class="stat"><p>Confirmed</p><h3 id="t5Conf">1</h3></div>
+          <div class="stat"><p>Available Seats</p><h3 id="t5Seats">11</h3></div>
+        </div>
+        <h2>Event Registration Status</h2>
+        <p class="desc">View registration and payment status for campus events.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Event</th><th>Student</th><th>Seats</th><th>Payment</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="t5Table"></tbody>
+          </table>
+        </div>
+        <div id="t5Msg" class="msg" role="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arr-line"></div><span class="arr-icon">&#8595;</span><div class="arr-line"></div></div>
+
+  <!-- S6: E2 Task3 Payment -->
+  <div class="sec-block" id="s6">
+    <div class="sec-hdr">
+      <div class="sh-num sh-e2">6</div>
+      <div><h3>Payment &amp; Confirmation</h3><div class="sub">E2 &#183; Task 3 &#8212; Event Payment Gateway</div></div>
+      <span class="sec-tag tag-e2">E2 &#183; T3</span>
+    </div>
+    <div class="sec-body">
+      <div class="tw">
+        <h2>Event Payment</h2>
+        <p class="desc">Complete payment to confirm your event registration.</p>
+        <div class="pay-layout">
+          <div class="pay-card">
+            <h3>Event Details</h3>
+            <div class="ev-info">
+              <p><strong>Event:</strong> Tech Fest 2026</p>
+              <p><strong>Date:</strong> 15 November 2026</p>
+              <p><strong>Venue:</strong> College Auditorium</p>
+              <p><strong>Registration Fee:</strong> &#8377;500</p>
+              <p><strong>Available Seats:</strong> <span id="t6Seats">20</span></p>
+            </div>
+            <p style="font-size:12px;margin:5px 0"><strong>Student:</strong> Rahul Sharma</p>
+            <p style="font-size:12px;margin:5px 0"><strong>Registration ID:</strong> CEMS-2026-101</p>
+            <div class="notice-box" style="margin-top:9px">This is a demonstration payment page. No real money will be charged.</div>
+          </div>
+          <div class="pay-card">
+            <h3>Complete Payment</h3>
+            <form id="t6Form">
+              <label for="t6Email">Student Email</label>
+              <input type="email" id="t6Email" placeholder="student@example.com" required>
+              <label for="t6Method">Payment Method</label>
+              <select id="t6Method" required>
+                <option value="">Select payment method</option>
+                <option value="UPI">UPI (Demo)</option>
+                <option value="Card">Card (Demo)</option>
+                <option value="Net Banking">Net Banking (Demo)</option>
+              </select>
+              <label for="t6Result">Simulate Payment Result</label>
+              <select id="t6Result">
+                <option value="success">Successful Payment</option>
+                <option value="failed">Failed Payment</option>
+              </select>
+              <button type="submit" class="btn-full" id="t6Btn">Pay &#8377;500</button>
+            </form>
+            <div id="t6Msg" class="msg" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// Sidebar & Progress
+const sids=['s1','s2','s3','s4','s5','s6'];
+const ms=document.getElementById('mainScroll');
+
+function goTo(id,el){
+  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+  setActive(sids.indexOf(id));
+}
+
+function setActive(idx){
+  document.querySelectorAll('.si').forEach((el,i)=>{
+    el.classList.toggle('active',i===idx);
+    el.classList.toggle('done',i<idx);
+  });
+  document.getElementById('progTxt').textContent='Step '+(idx+1)+' / 6';
+  document.getElementById('progFill').style.width=((idx+1)/6*100)+'%';
+}
+
+ms.addEventListener('scroll',()=>{
+  let cur=0;
+  sids.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el&&el.offsetTop-ms.scrollTop-130<=0) cur=i;
+  });
+  setActive(cur);
+});
+
+// E1 Task 1: Login
+const DEMO_EMAIL='student@example.com';
+let DEMO_PWD='Student123';
+
+document.getElementById('loginForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const email=document.getElementById('t1Email').value.trim().toLowerCase();
+  const pwd=document.getElementById('t1Pass').value;
+  const m=document.getElementById('t1Msg');
+  if(email===DEMO_EMAIL&&pwd===DEMO_PWD){
+    m.textContent='Login successful! Welcome to CEMS.';m.className='msg ok';
+  }else{
+    m.textContent='Invalid email or password. Please try again.';m.className='msg err';
+  }
+});
+
+// E1 Task 2: Role Access
+const perms={STUDENT:['EVENTS','STUDENT'],ORGANIZER:['EVENTS','ORGANIZER'],ADMIN:['EVENTS','STUDENT','ORGANIZER','ADMIN']};
+const secNames={STUDENT:'Student Section',ORGANIZER:'Organizer Section',ADMIN:'Administrator Section',EVENTS:'Public Events'};
+const feats={
+  STUDENT:['Browse campus events','Register for events','View your registrations'],
+  ORGANIZER:['Create and manage events','View event registrations','Monitor event seats'],
+  ADMIN:['Manage users and roles','Manage all events','View system information']
+};
+
+function t2Dashboard(){
+  const r=document.getElementById('t2Role').value;
+  document.getElementById('t2Dash').innerHTML='<strong>Welcome, '+r+'</strong><br>Available features:<ul style="margin:5px 0 0 16px;line-height:1.9">'+feats[r].map(f=>'<li>'+f+'</li>').join('')+'</ul>';
+  t2Msg('Dashboard opened for '+r+'.',true);
+}
+function t2Access(sec){
+  const r=document.getElementById('t2Role').value;
+  const ok=perms[r].includes(sec);
+  t2Msg((ok?'Access granted: ':'Access denied: ')+r+(ok?' can ':' cannot ')+' access '+secNames[sec]+'.',ok);
+}
+function t2Msg(txt,ok){const m=document.getElementById('t2Msg');m.textContent=txt;m.className='msg '+(ok?'ok':'err');}
+t2Dashboard();
+
+// E1 Task 3: Password Reset
+let resetCode=null;
+function t3Msg(txt,ok){const m=document.getElementById('t3Msg');m.textContent=txt;m.className='msg '+(ok?'ok':'err');}
+
+document.getElementById('t3ReqForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const email=document.getElementById('t3ResetEmail').value.trim().toLowerCase();
+  if(email!==DEMO_EMAIL){t3Msg('If the account exists, reset instructions will be sent.',true);return;}
+  resetCode=String(Math.floor(100000+Math.random()*900000));
+  t3Msg('Demo reset code: '+resetCode+'. Use this in the reset form below.',true);
+});
+
+document.getElementById('t3ResetForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const code=document.getElementById('t3Code').value.trim();
+  const np=document.getElementById('t3NewPwd').value;
+  const cp=document.getElementById('t3ConfPwd').value;
+  if(!resetCode||code!==resetCode){t3Msg('Invalid reset code. Request a new code.',false);return;}
+  if(np.length<8){t3Msg('Password must be at least 8 characters.',false);return;}
+  if(np!==cp){t3Msg('Passwords do not match.',false);return;}
+  DEMO_PWD=np;resetCode=null;
+  document.getElementById('t3ResetForm').reset();
+  t3Msg('Password reset successful! Test login with your new password below.',true);
+});
+
+document.getElementById('t3TestLogin').addEventListener('submit',function(e){
+  e.preventDefault();
+  const email=document.getElementById('t3TEmail').value.trim().toLowerCase();
+  const pwd=document.getElementById('t3TPwd').value;
+  if(email===DEMO_EMAIL&&pwd===DEMO_PWD){t3Msg('Login successful! Authentication test passed.',true);}
+  else{t3Msg('Invalid email or password. Authentication test failed.',false);}
+});
+
+// E2 Task 1: Event Registration
+const t4Events=[
+  {id:101,name:'Hackathon 2026',date:'15 Nov 2026',venue:'Computer Lab',avail:3},
+  {id:102,name:'Web Development Workshop',date:'18 Nov 2026',venue:'Seminar Hall',avail:2},
+  {id:103,name:'Annual Tech Fest',date:'22 Nov 2026',venue:'College Auditorium',avail:3}
+];
+const t4Regs={101:[],102:[],103:[]};
+
+function t4Render(){
+  const list=document.getElementById('t4List');list.innerHTML='';
+  t4Events.forEach(ev=>{
+    const full=ev.avail===0;
+    const c=document.createElement('div');c.className='ev-card';
+    c.innerHTML='<h4>'+ev.name+'</h4><p><strong>Date:</strong> '+ev.date+'</p><p><strong>Venue:</strong> '+ev.venue+'</p>'
+      +'<span class="seat-tag'+(full?' full':'')+'">'+( full?'Event Full':ev.avail+' seats available')+'</span>'
+      +'<label for="t4s'+ev.id+'">Student ID</label>'
+      +'<input type="text" id="t4s'+ev.id+'" placeholder="e.g. STU001" maxlength="30">'
+      +'<button onclick="t4Register('+ev.id+')" '+(full?'disabled':'')+' style="width:100%;margin-top:8px">Register Now</button>';
+    list.appendChild(c);
+  });
+  document.getElementById('t4Total').textContent=t4Events.length;
+  document.getElementById('t4Seats').textContent=t4Events.reduce((s,e)=>s+e.avail,0);
+  document.getElementById('t4MyRegs').textContent=Object.values(t4Regs).reduce((s,l)=>s+l.length,0);
+}
+
+function t4Register(id){
+  const ev=t4Events.find(e=>e.id===id);
+  const sid=document.getElementById('t4s'+id).value.trim().toUpperCase();
+  const m=document.getElementById('t4Msg');
+  if(!sid){m.textContent='Please enter your student ID.';m.className='msg err';return;}
+  if(ev.avail<=0){m.textContent='This event is full.';m.className='msg err';t4Render();return;}
+  if(t4Regs[id].includes(sid)){m.textContent='You already registered for this event.';m.className='msg err';return;}
+  t4Regs[id].push(sid);ev.avail--;
+  m.textContent='Registration successful for '+ev.name+'! Student ID: '+sid;m.className='msg ok';
+  t4Render();t4History(sid);
+}
+
+function t4History(sid){
+  const h=document.getElementById('t4Hist');
+  const regs=t4Events.filter(ev=>t4Regs[ev.id].includes(sid));
+  if(!regs.length){h.textContent='No registrations yet.';return;}
+  h.innerHTML='';
+  regs.forEach(ev=>{const d=document.createElement('div');d.className='reg-item';d.textContent=ev.name+' — '+ev.date+' — Registered';h.appendChild(d);});
+}
+t4Render();
+
+// E2 Task 2: Registration Dashboard
+const t5Events=[
+  {id:1,name:'Hackathon 2026',student:'Rahul',seats:5,payment:'Paid',status:'Confirmed'},
+  {id:2,name:'Web Development Workshop',student:'Priya',seats:4,payment:'Pending',status:'Pending'},
+  {id:3,name:'Tech Fest',student:'Amit',seats:2,payment:'Free',status:'Confirmed'}
+];
+
+function t5Render(){
+  const tb=document.getElementById('t5Table');tb.innerHTML='';
+  t5Events.forEach(ev=>{
+    const cls=ev.status==='Confirmed'?'pill-ok':ev.status==='Pending'?'pill-pend':'pill-err';
+    const r=document.createElement('tr');
+    r.innerHTML='<td>'+ev.name+'</td><td>'+ev.student+'</td><td>'+ev.seats+'</td><td>'+ev.payment+'</td>'
+      +'<td><span class="pill '+cls+'">'+ev.status+'</span></td>'
+      +'<td><button style="width:auto;padding:6px 11px" '+(ev.status==='Confirmed'||ev.seats===0?'disabled':'')+' onclick="t5Confirm('+ev.id+')">Confirm</button></td>';
+    tb.appendChild(r);
+  });
+  document.getElementById('t5Total').textContent=t5Events.length;
+  document.getElementById('t5Conf').textContent=t5Events.filter(e=>e.status==='Confirmed').length;
+  document.getElementById('t5Seats').textContent=t5Events.reduce((s,e)=>s+e.seats,0);
+}
+
+function t5Confirm(id){
+  const ev=t5Events.find(e=>e.id===id);
+  const m=document.getElementById('t5Msg');
+  if(!ev){m.textContent='Event not found.';m.className='msg err';return;}
+  if(ev.seats<=0){m.textContent='No seats available.';m.className='msg err';return;}
+  if(ev.status==='Confirmed'){m.textContent='Already confirmed.';m.className='msg err';return;}
+  if(ev.payment==='Pending'){m.textContent='Payment is pending. Complete payment first.';m.className='msg err';return;}
+  ev.seats--;ev.status='Confirmed';t5Render();
+  m.textContent='Registration confirmed for '+ev.name+'.';m.className='msg ok';
+}
+t5Render();
+
+// E2 Task 3: Payment
+let t6Seats=20,t6Done=false;
+function esc(v){return v.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+document.getElementById('t6Form').addEventListener('submit',function(e){
+  e.preventDefault();
+  const m=document.getElementById('t6Msg');
+  if(t6Done){m.innerHTML='Registration already confirmed.';m.className='msg ok';return;}
+  if(t6Seats<=0){m.innerHTML='No seats available.';m.className='msg err';return;}
+  const email=document.getElementById('t6Email').value;
+  const method=document.getElementById('t6Method').value;
+  const res=document.getElementById('t6Result').value;
+  if(!email||!method){m.innerHTML='Please complete all fields.';m.className='msg err';return;}
+  if(res==='failed'){m.innerHTML='Payment failed. Please try again.';m.className='msg err';return;}
+  t6Seats--;t6Done=true;
+  document.getElementById('t6Seats').textContent=t6Seats;
+  m.innerHTML='<strong>Payment Successful!</strong><br><br>Registration Confirmed<br>Event: Tech Fest 2026<br>Registration ID: CEMS-2026-101<br>Email: '+esc(email)+'<br>Method: '+esc(method)+'<br>Amount: &#8377;500<br>Status: <strong>Confirmed</strong>';
+  m.className='msg ok';
+  const btn=document.getElementById('t6Btn');btn.textContent='Payment Completed';btn.disabled=true;
+});
+</script>
+</body>
+</html>
